@@ -106,19 +106,8 @@ public class UIManager : MonoBehaviour
     public Reward GetClosestRewardToPointer(float currentRotation)
     {
         float normalizedRotation = (360 - currentRotation) % 360;
-        float closestAngle = float.MaxValue;
-        Reward closestReward = null;
-
-        foreach (var rewardPosition in rewardPositions)
-        {
-            float angleDifference = Mathf.Abs(Mathf.DeltaAngle(normalizedRotation, rewardPosition.angle));
-            if (angleDifference < closestAngle)
-            {
-                closestAngle = angleDifference;
-                closestReward = rewardPosition.reward;
-            }
-        }
-
-        return closestReward;
+        float anglePerItem = 360f / rewardPositions.Count;
+        int closestIndex = Mathf.RoundToInt(normalizedRotation / anglePerItem) % rewardPositions.Count;
+        return rewardPositions[closestIndex].reward;
     }
 }
