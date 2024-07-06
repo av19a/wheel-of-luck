@@ -1,0 +1,29 @@
+Package Structure and Code Architecture
+
+Core Classes:
+
+WheelOfLuck: Central class managing the wheel's logic and state.
+WheelSpinner: Handles the spinning animation and mechanics.
+RewardManager: Manages the pool of rewards and their distribution.
+UIManager: Manages the user interface for the Wheel of Luck.
+
+
+Configuration:
+
+WheelConfig: ScriptableObject for configuring wheel parameters.
+
+
+Reward System:
+
+Reward: Abstract base class for all rewards.
+ConsumableReward: Represents consumable items like currency or hexes.
+UniqueReward: Represents unique items like skins or special items.
+
+
+Utility:
+
+GameManager: Singleton class for game-wide management.
+
+
+Architecture Overview:
+The package follows a component-based architecture with clear separation of concerns. The WheelOfLuck class acts as the main controller, coordinating between the WheelSpinner, RewardManager, and UIManager. The reward system uses inheritance to create different types of rewards, allowing for easy expansion. The WheelConfig ScriptableObject allows for easy configuration of the wheel's parameters without changing code.

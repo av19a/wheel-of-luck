@@ -3,16 +3,18 @@ using System.Collections.Generic;
 
 public class WheelOfLuck : MonoBehaviour
 {
-    public WheelConfig config;
-    [HideInInspector]
-    public List<Reward> currentRewards = new List<Reward>();
-    [HideInInspector]
-    public int spinCount = 0;
+    [SerializeField] public WheelConfig config;
+    [SerializeField] public List<Reward> mandatoryRewards = new List<Reward>();
+    public IReadOnlyList<Reward> MandatoryRewards => mandatoryRewards;
+
     private RewardManager rewardManager;
     private WheelSpinner spinner;
     private UIManager uiManager;
-    [HideInInspector]
-    public float currentRotation = 0f;
+
+    public List<Reward> CurrentRewards { get; private set; } = new List<Reward>();
+    public int SpinCount { get; private set; } = 0;
+    public float CurrentRotation { get; set; } = 0;
+    public int CurrentMandatoryRewardIndex { get; private set; } = 0;
 
     private void Awake()
     {
@@ -28,30 +30,44 @@ public class WheelOfLuck : MonoBehaviour
 
     private void InitializeWheel()
     {
-        currentRewards = rewardManager.GetInitialRewards();
-        uiManager.SetupWheelDisplay(currentRewards);
+        CurrentRewards = rewardManager.GetInitialRewards();
+        ApplyMandatoryRewardIfNeeded();
+        uiManager.SetupWheelDisplay(CurrentRewards);
+    }
+
+    private void ApplyMandatoryRewardIfNeeded()
+    {
+        if (mandatoryRewards.Count > 0 && CurrentRewards.Count > 0)
+        {
+            CurrentRewards[0] = mandatoryRewards[0];
+            CurrentMandatoryRewardIndex = 0;
+        }
     }
 
     public void Spin()
     {
-        if (spinCount < config.freeSpins)
+        if (CanSpin())
         {
             PerformSpin();
         }
-        // else if (PlayerHasEnoughCurrency())
-        // {
-        //     DeductSpinCost();
-        //     PerformSpin();
-        // }
         else
         {
             uiManager.ShowInsufficientCurrencyMessage();
         }
     }
 
+    private bool CanSpin()
+    {
+        return SpinCount < config.freeSpins || PlayerHasEnoughCurrency();
+    }
+
     private void PerformSpin()
     {
-        spinCount++;
+        SpinCount++;
+        if (SpinCount > config.freeSpins)
+        {
+            DeductSpinCost();
+        }
         spinner.Spin(OnSpinComplete);
     }
 
@@ -59,29 +75,60 @@ public class WheelOfLuck : MonoBehaviour
     {
         rewardManager.ClaimReward(reward);
         uiManager.ShowRewardClaimedMessage(reward);
-        Reward newReward = rewardManager.GetNewReward();
-        currentRewards[currentRewards.IndexOf(reward)] = newReward;
-        uiManager.UpdateWheelDisplay(currentRewards);
+        UpdateRewards();
     }
-    
-    private List<Reward> GetRandomRewards()
+
+    private void UpdateRewards()
     {
-        List<Reward> randomRewards = new List<Reward>();
-        List<Reward> tempRewards = new List<Reward>(currentRewards);
+        List<Reward> updatedRewards = GetUpdatedRewards();
+        CurrentRewards = updatedRewards;
+        uiManager.UpdateWheelDisplay(updatedRewards);
+    }
 
-        for (int i = 0; i < config.totalPositions; i++)
+    private List<Reward> GetUpdatedRewards()
+    {
+        List<Reward> updatedRewards = new List<Reward>(CurrentRewards);
+
+        if (CurrentMandatoryRewardIndex < mandatoryRewards.Count)
         {
-            if (tempRewards.Count == 0)
-            {
-                tempRewards = new List<Reward>(currentRewards);
-            }
-
-            int randomIndex = Random.Range(0, tempRewards.Count);
-            randomRewards.Add(tempRewards[randomIndex]);
-            tempRewards.RemoveAt(randomIndex);
+            UpdateMandatoryReward(updatedRewards);
+        }
+        else
+        {
+            UpdateRandomRewards(updatedRewards);
         }
 
-        return randomRewards;
+        return updatedRewards;
+    }
+
+    private void UpdateMandatoryReward(List<Reward> updatedRewards)
+    {
+        int claimedIndex = updatedRewards.FindIndex(r => r == mandatoryRewards[CurrentMandatoryRewardIndex]);
+        claimedIndex = claimedIndex == -1 ? 0 : claimedIndex;
+
+        CurrentMandatoryRewardIndex++;
+
+        if (CurrentMandatoryRewardIndex < mandatoryRewards.Count)
+        {
+            updatedRewards[claimedIndex] = mandatoryRewards[CurrentMandatoryRewardIndex];
+        }
+        else
+        {
+            updatedRewards[claimedIndex] = GetRandomReward();
+        }
+    }
+
+    private void UpdateRandomRewards(List<Reward> updatedRewards)
+    {
+        for (int i = 0; i < updatedRewards.Count; i++)
+        {
+            updatedRewards[i] = GetRandomReward();
+        }
+    }
+
+    private Reward GetRandomReward()
+    {
+        return rewardManager.GetNewReward();
     }
 
     private bool PlayerHasEnoughCurrency()

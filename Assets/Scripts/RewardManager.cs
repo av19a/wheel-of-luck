@@ -4,26 +4,28 @@ using System.Linq;
 
 public class RewardManager : MonoBehaviour
 {
-    public List<Reward> rewardPool;
+    [SerializeField] private List<Reward> rewardPool;
+    [SerializeField] private WheelConfig config;
 
     public List<Reward> GetInitialRewards()
     {
-        WheelConfig config = GetComponent<WheelOfLuck>().config;
         List<Reward> initialRewards = new List<Reward>();
 
         for (int i = 0; i < config.totalPositions; i++)
         {
-            if (i < config.initialCustomRewards.Count)
-            {
-                initialRewards.Add(config.initialCustomRewards[i]);
-            }
-            else
-            {
-                initialRewards.Add(GetRandomReward());
-            }
+            initialRewards.Add(GetRewardForPosition(i));
         }
 
         return initialRewards;
+    }
+
+    private Reward GetRewardForPosition(int position)
+    {
+        if (position < config.initialCustomRewards.Count)
+        {
+            return config.initialCustomRewards[position];
+        }
+        return GetRandomReward();
     }
 
     public void ClaimReward(Reward reward)
@@ -31,8 +33,13 @@ public class RewardManager : MonoBehaviour
         reward.Apply();
         if (reward is UniqueReward)
         {
-            rewardPool.Remove(reward);
+            RemoveUniqueReward(reward);
         }
+    }
+
+    private void RemoveUniqueReward(Reward reward)
+    {
+        rewardPool.Remove(reward);
     }
 
     public Reward GetNewReward()

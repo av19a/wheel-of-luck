@@ -717,6 +717,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 1702464364}
     m_Modifications:
     - target: {fileID: -6083720285457771444, guid: 1c1b0e5a4c23e4fa89d120082c90c52f, type: 3}
+      propertyPath: config
+      value: 
+      objectReference: {fileID: 11400000, guid: add473af649ec4abf93c8859eb349d44, type: 2}
+    - target: {fileID: -6083720285457771444, guid: 1c1b0e5a4c23e4fa89d120082c90c52f, type: 3}
       propertyPath: rewardPool.Array.size
       value: 7
       objectReference: {fileID: 0}
@@ -748,6 +752,10 @@ PrefabInstance:
       propertyPath: rewardPool.Array.data[6]
       value: 
       objectReference: {fileID: 11400000, guid: d20e61a5535e04c619bad7426e3d097c, type: 2}
+    - target: {fileID: -1678791074567029700, guid: 1c1b0e5a4c23e4fa89d120082c90c52f, type: 3}
+      propertyPath: wheelConfig
+      value: 
+      objectReference: {fileID: 11400000, guid: add473af649ec4abf93c8859eb349d44, type: 2}
     - target: {fileID: -1678791074567029700, guid: 1c1b0e5a4c23e4fa89d120082c90c52f, type: 3}
       propertyPath: wheelOfLuck
       value: 
@@ -797,8 +805,20 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1025406212454808691, guid: 1c1b0e5a4c23e4fa89d120082c90c52f, type: 3}
+      propertyPath: customRewards.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1025406212454808691, guid: 1c1b0e5a4c23e4fa89d120082c90c52f, type: 3}
       propertyPath: currentRewards.Array.size
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1025406212454808691, guid: 1c1b0e5a4c23e4fa89d120082c90c52f, type: 3}
+      propertyPath: customRewards.Array.data[0]
+      value: 
+      objectReference: {fileID: 11400000, guid: d20e61a5535e04c619bad7426e3d097c, type: 2}
+    - target: {fileID: 1025406212454808691, guid: 1c1b0e5a4c23e4fa89d120082c90c52f, type: 3}
+      propertyPath: mandatoryRewards.Array.size
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1025406212454808691, guid: 1c1b0e5a4c23e4fa89d120082c90c52f, type: 3}
       propertyPath: currentRewards.Array.data[0]
@@ -824,6 +844,34 @@ PrefabInstance:
       propertyPath: currentRewards.Array.data[5]
       value: 
       objectReference: {fileID: 11400000, guid: 979b7178bab3a4e74a4c1d383d08ea75, type: 2}
+    - target: {fileID: 1025406212454808691, guid: 1c1b0e5a4c23e4fa89d120082c90c52f, type: 3}
+      propertyPath: mandatoryRewards.Array.data[0]
+      value: 
+      objectReference: {fileID: 11400000, guid: d20e61a5535e04c619bad7426e3d097c, type: 2}
+    - target: {fileID: 1025406212454808691, guid: 1c1b0e5a4c23e4fa89d120082c90c52f, type: 3}
+      propertyPath: mandatoryRewards.Array.data[1]
+      value: 
+      objectReference: {fileID: 11400000, guid: f907c996b57ad4453a1e35a6d05ea893, type: 2}
+    - target: {fileID: 1025406212454808691, guid: 1c1b0e5a4c23e4fa89d120082c90c52f, type: 3}
+      propertyPath: mandatoryRewards.Array.data[2]
+      value: 
+      objectReference: {fileID: 11400000, guid: 4034d2f57731d404b9721a6092215fa2, type: 2}
+    - target: {fileID: 1025406212454808691, guid: 1c1b0e5a4c23e4fa89d120082c90c52f, type: 3}
+      propertyPath: customInitialRewards.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1025406212454808691, guid: 1c1b0e5a4c23e4fa89d120082c90c52f, type: 3}
+      propertyPath: customInitialRewards.Array.data[0]
+      value: 
+      objectReference: {fileID: 11400000, guid: d20e61a5535e04c619bad7426e3d097c, type: 2}
+    - target: {fileID: 1025406212454808691, guid: 1c1b0e5a4c23e4fa89d120082c90c52f, type: 3}
+      propertyPath: customInitialRewards.Array.data[1]
+      value: 
+      objectReference: {fileID: 11400000, guid: f907c996b57ad4453a1e35a6d05ea893, type: 2}
+    - target: {fileID: 1025406212454808691, guid: 1c1b0e5a4c23e4fa89d120082c90c52f, type: 3}
+      propertyPath: customInitialRewards.Array.data[2]
+      value: 
+      objectReference: {fileID: 11400000, guid: 4034d2f57731d404b9721a6092215fa2, type: 2}
     - target: {fileID: 2175418943537646262, guid: 1c1b0e5a4c23e4fa89d120082c90c52f, type: 3}
       propertyPath: spinButton
       value: 
