@@ -1,12 +1,12 @@
 using UnityEngine;
 using System.Collections;
 using System;
-using Random = UnityEngine.Random;
 
 public class WheelSpinner : MonoBehaviour
 {
-    public float spinDuration = 4f;
-    public AnimationCurve spinCurve;
+    [SerializeField] private float spinDuration = 4f;
+    [SerializeField] private AnimationCurve spinCurve;
+    [SerializeField] private WheelConfig wheelConfig;
 
     private bool isSpinning = false;
     private UIManager uiManager;
@@ -18,80 +18,89 @@ public class WheelSpinner : MonoBehaviour
         wheelOfLuck = GetComponent<WheelOfLuck>();
     }
 
-    public void Spin(Action<Reward> onComplete, int customFalloutRewards, AnimationCurve customFalloutCurve)
+    public void Spin(Action<Reward> onComplete)
     {
         if (!isSpinning)
         {
-            StartCoroutine(SpinCoroutine(onComplete, customFalloutRewards, customFalloutCurve));
+            StartCoroutine(SpinCoroutine(onComplete));
         }
     }
 
-    private IEnumerator SpinCoroutine(Action<Reward> onComplete, int customFalloutRewards, AnimationCurve customFalloutCurve)
+    private IEnumerator SpinCoroutine(Action<Reward> onComplete)
     {
         isSpinning = true;
-        float elapsedTime = 0f;
-        float startRotation = wheelOfLuck.currentRotation;
-        float endRotation;
+        float startRotation = wheelOfLuck.CurrentRotation;
+        float endRotation = CalculateEndRotation(startRotation);
 
-        // If there are mandatory rewards left, calculate the end rotation to land on the mandatory reward
-        if (wheelOfLuck.currentMandatoryRewardIndex < wheelOfLuck.mandatoryRewards.Count)
+        yield return PerformSpinAnimation(startRotation, endRotation);
+
+        Reward selectedReward = DetermineSelectedReward();
+        isSpinning = false;
+        onComplete?.Invoke(selectedReward);
+    }
+
+    private float CalculateEndRotation(float startRotation)
+    {
+        if (wheelOfLuck.CurrentMandatoryRewardIndex < wheelOfLuck.MandatoryRewards.Count)
         {
-            endRotation = CalculateRotationForMandatoryReward(startRotation);
+            return CalculateRotationForMandatoryReward(startRotation);
         }
         else
         {
-            // If no mandatory rewards left, use the original random rotation
-            float additionalRotation = CalculateAdditionalRotation(customFalloutRewards, customFalloutCurve);
-            endRotation = startRotation + additionalRotation;
+            return CalculateRandomEndRotation(startRotation);
+        }
+    }
+
+    private float CalculateRotationForMandatoryReward(float startRotation)
+    {
+        int rewardCount = wheelOfLuck.CurrentRewards.Count;
+        float anglePerItem = 360f / rewardCount;
+        
+        int targetIndex = wheelOfLuck.CurrentRewards.FindIndex(r => r == wheelOfLuck.MandatoryRewards[wheelOfLuck.CurrentMandatoryRewardIndex]);
+        
+        if (targetIndex == -1)
+        {
+            Debug.LogError("Mandatory reward not found on the wheel!");
+            return startRotation + 360f * 5; // Default to 5 full rotations
         }
 
+        float targetAngle = (rewardCount - targetIndex) * anglePerItem;
+        float rotationNeeded = (targetAngle - startRotation + 360f) % 360f;
+        
+        return startRotation + rotationNeeded + 360f * 5; // 5 full rotations plus needed rotation
+    }
+
+    private float CalculateRandomEndRotation(float startRotation)
+    {
+        float baseRotation = UnityEngine.Random.Range(720f, 1080f); // 2-3 full rotations
+        float customFallout = wheelConfig.customFalloutCurve.Evaluate(UnityEngine.Random.value) * 360f * wheelConfig.customFalloutRewards;
+        return startRotation + baseRotation + customFallout;
+    }
+
+    private IEnumerator PerformSpinAnimation(float startRotation, float endRotation)
+    {
+        float elapsedTime = 0f;
         while (elapsedTime < spinDuration)
         {
             float t = elapsedTime / spinDuration;
             float curveValue = spinCurve.Evaluate(t);
             float currentRotation = Mathf.Lerp(startRotation, endRotation, curveValue);
-            uiManager.RotateWheel(currentRotation);
-            wheelOfLuck.currentRotation = currentRotation % 360f;
+            UpdateWheelRotation(currentRotation);
             elapsedTime += Time.deltaTime;
             yield return null;
         }
 
-        uiManager.RotateWheel(endRotation);
-        wheelOfLuck.currentRotation = endRotation % 360f;
-
-        Reward selectedReward = uiManager.GetClosestRewardToPointer(wheelOfLuck.currentRotation);
-        isSpinning = false;
-        onComplete(selectedReward);
-    }        
-     
-    private float CalculateRotationForMandatoryReward(float startRotation)
-    {
-        int rewardCount = wheelOfLuck.currentRewards.Count;
-        float anglePerItem = 360f / rewardCount;
-        
-        // Find the index of the current mandatory reward
-        int targetIndex = wheelOfLuck.currentRewards.FindIndex(r => r == wheelOfLuck.mandatoryRewards[wheelOfLuck.currentMandatoryRewardIndex]);
-        
-        if (targetIndex == -1)
-        {
-            Debug.LogError("Mandatory reward not found on the wheel!");
-            return startRotation + 360f * 5; // Default to 5 full rotations if something went wrong
-        }
-
-        // Calculate the angle to the target reward
-        float targetAngle = (rewardCount - targetIndex) * anglePerItem;
-        
-        // Calculate how much we need to rotate to reach the target
-        float rotationNeeded = (targetAngle - startRotation + 360f) % 360f;
-        
-        // Add additional full rotations for effect (e.g., 5 full rotations plus the needed rotation)
-        return startRotation + rotationNeeded + 360f * 5;
+        UpdateWheelRotation(endRotation);
     }
-                                                                                                                                                               
-     private float CalculateAdditionalRotation(int customFalloutRewards, AnimationCurve customFalloutCurve)                                                    
-     {                                                                                                                                                         
-         float baseRotation = Random.Range(720f, 1080f); // 2-3 full rotations                                                                     
-         float customFallout = customFalloutCurve.Evaluate(Random.value) * 360f * customFalloutRewards;                                            
-         return baseRotation + customFallout;                                                                                                                  
-     }
+
+    private void UpdateWheelRotation(float rotation)
+    {
+        uiManager.RotateWheel(rotation);
+        wheelOfLuck.CurrentRotation = rotation % 360f;
+    }
+
+    private Reward DetermineSelectedReward()
+    {
+        return uiManager.GetClosestRewardToPointer(wheelOfLuck.CurrentRotation);
+    }
 }

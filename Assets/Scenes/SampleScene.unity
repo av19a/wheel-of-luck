@@ -717,6 +717,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 1702464364}
     m_Modifications:
     - target: {fileID: -6083720285457771444, guid: 1c1b0e5a4c23e4fa89d120082c90c52f, type: 3}
+      propertyPath: config
+      value: 
+      objectReference: {fileID: 11400000, guid: add473af649ec4abf93c8859eb349d44, type: 2}
+    - target: {fileID: -6083720285457771444, guid: 1c1b0e5a4c23e4fa89d120082c90c52f, type: 3}
       propertyPath: rewardPool.Array.size
       value: 7
       objectReference: {fileID: 0}
@@ -748,6 +752,10 @@ PrefabInstance:
       propertyPath: rewardPool.Array.data[6]
       value: 
       objectReference: {fileID: 11400000, guid: d20e61a5535e04c619bad7426e3d097c, type: 2}
+    - target: {fileID: -1678791074567029700, guid: 1c1b0e5a4c23e4fa89d120082c90c52f, type: 3}
+      propertyPath: wheelConfig
+      value: 
+      objectReference: {fileID: 11400000, guid: add473af649ec4abf93c8859eb349d44, type: 2}
     - target: {fileID: -1678791074567029700, guid: 1c1b0e5a4c23e4fa89d120082c90c52f, type: 3}
       propertyPath: wheelOfLuck
       value: 
